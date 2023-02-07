@@ -75,6 +75,64 @@
 
 </table>
 
+<hr>
+<h1>Code fencing</h1>
+
+<b>Apache2 mod_rewrite to custom maintenance.html page
+    I have the following situation. I have for my webapp under /var/www the folder "my_project". Now I want to display a maintenance page using mod_rewrite.
+
+For this I have placed under /var/www the file "maintenance.html". Additionally I added the following rewrite conditions including the following rewrite rule in the config file for the "my_project" folder under /etc/apache2/sites-available :
+
+<VirtualHost *:80>
+    ServerAdmin webmaster@localhost
+    ServerName my_project.de
+    ServerAlias www.my_project.de
+
+    DocumentRoot /var/www/my_project.de/public
+
+    <Directory /var/www/my_project.de/public/>
+      Options Indexes FollowSymLinks MultiViews
+      AllowOverride All
+      Require all granted
+    </Directory>
+
+    RewriteEngine on
+    RewriteCond /var/www/maintenance.html -f
+    RewriteCond %{REQUEST_URI} !^/maintenance\.html$
+    RewriteCond %{REMOTE_ADDR} !^00\.00\.00\.000
+    RewriteRule ^ - [R=503]
+    ErrorDocument 503 /var/www/maintenance.html
+    
+
+    LogLevel debug
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
+</b>
+
+<a href="https://stackoverflow.com/questions/75151346/apache2-mod-rewrite-to-custom-maintenance-html-page">link to stackoverflow</a>
+
+<b>Solution for the above question</b>
+
+<pre>https://css-tricks.com/snippets/htaccess/temporary-maintenance-using-mod_rewrite/</pre>
+
+<b> # Don't forget to turn on the rewrite engine
+    RewriteEngine on
+    
+    # Maintenance Redirection
+    # Replace 555\.555\.555\.555 with your own IP address
+    # Uncomment first conditional to turn off the redirection
+    # RewriteCond %{REQUEST_URI} ^$a
+    RewriteCond %{REQUEST_URI} !maintenance.html
+    RewriteCond %{REQUEST_FILENAME} !(styles|images).+$
+    RewriteCond %{REMOTE_ADDR} !^555\.555\.555\.555$
+    RewriteCond %{REMOTE_ADDR} !^127\.0\.0\.1$
+    RewriteRule (.*) /maintenance.html [R,L]
+    </b>
+
+
+
+
 
 </body>
 </html>
